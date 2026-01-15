@@ -2,6 +2,8 @@
 
 MDConvert is a secure, serverless, local-processing web application that converts various file formats (HTML, JS, JSX, PDF) into Markdown.
 
+<img width="861" height="526" alt="mdconvert" src="https://github.com/user-attachments/assets/ee72c5da-f30a-40c2-9d36-2b4795b19c5c" />
+
 ## Features
 
 -   **Universal Conversion**: Converts HTML, React (JSX), JavaScript, and PDF files to formatted Markdown.
