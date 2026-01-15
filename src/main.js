@@ -4,7 +4,7 @@ import JSZip from 'jszip'
 import * as pdfjsLib from 'pdfjs-dist'
 
 // Worker setup for PDF.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
 
 // Theme Logic
