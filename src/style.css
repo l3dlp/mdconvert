@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #ffffff;
+    --fg: #000000;
+    --border: #000000;
+    --shadow: #000000;
+  }
+
+  [data-theme="dark"] {
+    --bg: #000000;
+    --fg: #ffffff;
+    --border: #ffffff;
+    --shadow: #ffffff;
+  }
+
+  body {
+    @apply font-sans bg-[var(--bg)] text-[var(--fg)] transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .neo-card {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 4px 4px 0px 0px var(--shadow);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  .neo-button {
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 2px 2px 0px 0px var(--shadow);
+    font-weight: 900;
+    text-transform: uppercase;
+    transition: all 0.1s ease;
+  }
+
+  .neo-button:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px 0px var(--shadow);
+  }
+
+  .neo-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px 0px var(--shadow);
+  }
+
+  .drop-zone {
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .drop-zone.dragover {
+    background-color: var(--fg);
+    color: var(--bg);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+  border: 2px solid var(--bg);
+}

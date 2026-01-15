@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Markdown Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&display=swap');
+
+        :root {
+            --bg: #ffffff;
+            --fg: #000000;
+            --border: #000000;
+            --shadow: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg: #000000;
+            --fg: #ffffff;
+            --border: #ffffff;
+            --shadow: #ffffff;
+        }
+
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--fg);
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .neo-card {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 4px 4px 0px 0px var(--shadow);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .neo-button {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 2px 2px 0px 0px var(--shadow);
+            font-weight: 900;
+            text-transform: uppercase;
+            transition: all 0.1s ease;
+        }
+
+        .neo-button:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px 0px var(--shadow);
+        }
+
+        .neo-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px 0px var(--shadow);
+        }
+
+        .drop-zone {
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .drop-zone.dragover {
+            background-color: var(--fg);
+            color: var(--bg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+            border: 2px solid var(--bg);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-12 flex flex-col items-center">
+
+    <div class="max-w-3xl w-full">
+        <!-- Theme Toggle & Header -->
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <h1 class="text-4xl font-black uppercase tracking-tighter leading-none">MD<span
+                        class="opacity-20">CONVERT</span></h1>
+                <p class="text-xs font-bold mt-2 uppercase opacity-70">HTML • REACT • PDF</p>
+            </div>
+            <button id="themeToggle" class="neo-button p-3 flex items-center justify-center">
+                <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="neo-card p-6 md:p-8 space-y-8">
+
+            <!-- Drop Zone -->
+            <div id="dropZone" class="drop-zone p-12 flex flex-col items-center justify-center cursor-pointer group">
+                <div class="neo-button p-4 mb-4 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <p class="text-lg font-black uppercase">Click or Drop Files</p>
+                <p class="text-[10px] font-bold opacity-60 mt-1 uppercase">HTML, JS, JSX, PDF</p>
+                <input type="file" id="fileInput" multiple accept=".html,.htm,.js,.jsx,.pdf" class="hidden">
+            </div>
+
+            <!-- Status -->
+            <div id="statusArea" class="hidden space-y-2">
+                <div class="flex justify-between text-[10px] font-black uppercase">
+                    <span id="progressText">Ready</span>
+                    <span id="percentText">0%</span>
+                </div>
+                <div class="w-full border border-[var(--border)] h-4 rounded-full overflow-hidden p-0.5">
+                    <div id="progressBar" class="bg-[var(--fg)] h-full rounded-full transition-all duration-300"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div id="resultsList" class="space-y-3 max-h-72 overflow-y-auto pr-2"></div>
+
+            <!-- Actions -->
+            <div id="actionArea" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="downloadZip" class="neo-button py-4 text-sm bg-[var(--fg)] !text-[var(--bg)]">
+                    Download ZIP
+                </button>
+                <button id="resetBtn" class="neo-button py-4 text-sm">
+                    Clear All
+                </button>
+            </div>
+        </div>
+
+        <footer class="mt-8 text-center text-[10px] font-black uppercase tracking-widest opacity-40">
+            Secure • Serverless • Local Processing
+        </footer>
+    </div>
+
+    <!-- Notification -->
+    <div id="toast"
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 neo-card px-8 py-3 transform translate-y-32 transition-transform duration-500 font-black text-xs uppercase z-50">
+        Done
+    </div>
+
+    <script>
+        // PDF Worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // Theme Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const html = document.documentElement;
+
+        themeToggle.onclick = () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+        };
+
+        // Conversion Logic
+        const turndownService = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
+        turndownService.remove(['script', 'style', 'noscript', 'iframe', 'svg', 'button', 'input', 'textarea']);
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const resultsList = document.getElementById('resultsList');
+        const actionArea = document.getElementById('actionArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const percentText = document.getElementById('percentText');
+        let convertedFiles = [];
+
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = handleFiles;
+        document.getElementById('resetBtn').onclick = () => {
+            resultsList.innerHTML = '';
+            actionArea.classList.add('hidden');
+            document.getElementById('statusArea').classList.add('hidden');
+            convertedFiles = [];
+            fileInput.value = '';
+        };
+
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles({ target: { files: e.dataTransfer.files } });
+        };
+
+        async function handleFiles(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            document.getElementById('statusArea').classList.remove('hidden');
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const ext = file.name.split('.').pop().toLowerCase();
+                let markdown = "";
+
+                try {
+                    if (ext === 'pdf') {
+                        markdown = await processPdf(file);
+                    } else {
+                        const raw = await file.text();
+                        markdown = turndownService.turndown(extractContent(raw));
+                    }
+                    const cleanName = file.name.replace(/\.[^/.]+$/, "") + ".md";
+                    convertedFiles.push({ name: cleanName, content: markdown });
+                    addToList(file.name, ext);
+                } catch (err) {
+                    addToList(file.name, ext, true);
+                }
+
+                const pct = Math.round(((i + 1) / files.length) * 100);
+                progressBar.style.width = pct + '%';
+                percentText.innerText = pct + '%';
+                progressText.innerText = file.name;
+            }
+            actionArea.classList.remove('hidden');
+            showToast("Success");
+        }
+
+        async function processPdf(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = `# ${file.name}\n\n`;
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                fullText += `## Page ${i}\n\n${textContent.items.map(item => item.str).join(' ')}\n\n`;
+            }
+            return fullText;
+        }
+
+        function extractContent(text) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            let source = doc.body.innerText.trim().length > 50 ? doc.body.innerHTML : "";
+            doc.querySelectorAll('script').forEach(s => {
+                const matches = s.textContent.match(/<([A-Z][A-Z0-9]*|h[1-6]|p|div|span|ul|li|section|article|b|i|strong|em)[^>]*>([\s\S]*?)<\/\1>|<([A-Z][A-Z0-9]*|h[1-6]|p|div|span|ul|li|section|article|b|i|strong|em)[^>]*\/>/gi);
+                if (matches) source += " " + matches.join(" ");
+            });
+            return (source || doc.body.innerHTML)
+                .replace(/\{.*?\}/g, '').replace(/\s(on[A-Z][a-z]+|className|style|ref|key)=["'].*?["']/g, '');
+        }
+
+        function addToList(name, ext, error = false) {
+            const item = document.createElement('div');
+            item.className = `neo-card p-3 flex justify-between items-center text-[10px] font-black uppercase`;
+            item.innerHTML = `
+                <div class="flex items-center space-x-2 truncate">
+                    <span class="px-1.5 border border-[var(--border)] rounded">${ext}</span>
+                    <span class="truncate">${name}</span>
+                </div>
+                <span class="${error ? 'text-red-500' : 'opacity-50'}">${error ? 'ERROR' : 'OK'}</span>
+            `;
+            resultsList.appendChild(item);
+        }
+
+        document.getElementById('downloadZip').onclick = async () => {
+            const zip = new JSZip();
+            convertedFiles.forEach(f => zip.file(f.name, f.content));
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `md_bundle_${Date.now()}.zip`;
+            a.click();
+        };
+
+        function showToast(m) {
+            const t = document.getElementById('toast');
+            t.innerText = m;
+            t.classList.remove('translate-y-32');
+            setTimeout(() => t.classList.add('translate-y-32'), 2500);
+        }
+    </script>
+</body>
+
+</html>

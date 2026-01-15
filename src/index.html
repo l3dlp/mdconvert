@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Universal Markdown Converter</title>
+</head>
+
+<body class="min-h-screen p-4 md:p-12 flex flex-col items-center">
+    <div class="max-w-3xl w-full">
+        <!-- Theme Toggle & Header -->
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <h1 class="text-4xl font-black uppercase tracking-tighter leading-none">
+                    MD<span class="opacity-20">CONVERT</span>
+                </h1>
+                <p class="text-xs font-bold mt-2 uppercase opacity-70">
+                    HTML • REACT • PDF
+                </p>
+            </div>
+            <button id="themeToggle" class="neo-button p-3 flex items-center justify-center">
+                <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="neo-card p-6 md:p-8 space-y-8">
+            <!-- Drop Zone -->
+            <div id="dropZone" class="drop-zone p-12 flex flex-col items-center justify-center cursor-pointer group">
+                <div class="neo-button p-4 mb-4 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <p class="text-lg font-black uppercase">Click or Drop Files</p>
+                <p class="text-[10px] font-bold opacity-60 mt-1 uppercase">
+                    HTML, JS, JSX, PDF
+                </p>
+                <input type="file" id="fileInput" multiple accept=".html,.htm,.js,.jsx,.pdf" class="hidden" />
+            </div>
+
+            <!-- Status -->
+            <div id="statusArea" class="hidden space-y-2">
+                <div class="flex justify-between text-[10px] font-black uppercase">
+                    <span id="progressText">Ready</span>
+                    <span id="percentText">0%</span>
+                </div>
+                <div class="w-full border border-[var(--border)] h-4 rounded-full overflow-hidden p-0.5">
+                    <div id="progressBar" class="bg-[var(--fg)] h-full rounded-full transition-all duration-300"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div id="resultsList" class="space-y-3 max-h-72 overflow-y-auto pr-2"></div>
+
+            <!-- Actions -->
+            <div id="actionArea" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="downloadZip" class="neo-button py-4 text-sm bg-[var(--fg)] !text-[var(--bg)]">
+                    Download ZIP
+                </button>
+                <button id="resetBtn" class="neo-button py-4 text-sm">
+                    Clear All
+                </button>
+            </div>
+        </div>
+
+        <footer class="mt-8 text-center text-[10px] font-black uppercase tracking-widest opacity-40">
+            Secure • Serverless • Local Processing
+        </footer>
+    </div>
+
+    <!-- Notification -->
+    <div id="toast"
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 neo-card px-8 py-3 transform translate-y-32 transition-transform duration-500 font-black text-xs uppercase z-50">
+        Done
+    </div>
+
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html>
